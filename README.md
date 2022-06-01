@@ -1,6 +1,6 @@
-# 虚拟机编译安装Xenomai
+# 虚拟机中Ubuntu16.04.7下Xenomai3.2.1编译&安装&配置步骤（Linux-4.16.99）
 
-## 配置
+## 环境配置
 
 * Oracle VM VirtualBox 6.1.18
 * ubuntu-16.04.7-desktop-amd64
@@ -10,7 +10,7 @@
 
 
 
-## 步骤
+## 基本步骤
 
 ### 1.下载Ubuntu16.04.7镜像源并安装
 
@@ -19,37 +19,35 @@
 
   * [中国科学技术大学](http://mirrors.ustc.edu.cn/ubuntu-releases/16.04/)
     http://mirrors.ustc.edu.cn/ubuntu-releases/16.04/
-  * 　[阿里云](http://mirrors.aliyun.com/ubuntu-releases/16.04/)
+  * [阿里云](http://mirrors.aliyun.com/ubuntu-releases/16.04/)
     http://mirrors.aliyun.com/ubuntu-releases/16.04/
-  * 　[兰州大学](http://mirror.lzu.edu.cn/ubuntu-releases/16.04/)
+  * [兰州大学](http://mirror.lzu.edu.cn/ubuntu-releases/16.04/)
     http://mirror.lzu.edu.cn/ubuntu-releases/16.04/
   * [北理工](http://mirror.bit.edu.cn/ubuntu-releases/16.04/)
     http://mirror.bit.edu.cn/ubuntu-releases/16.04/
-  * 　[浙大](http://mirrors.zju.edu.cn/ubuntu-releases/16.04/)
+  * [浙大](http://mirrors.zju.edu.cn/ubuntu-releases/16.04/)
     http://mirrors.zju.edu.cn/ubuntu-releases/16.04/ 
 
 * 在Virtualbox安装Ubuntu-16.04.7
 
-  ***<font color=red>！！！注意：虚拟机磁盘可用空间不要小于20G（但仍不保证空间足够，分配多大空间自己把握，做好磁盘空间不足准备）！！！</font>***
+  ***<font color=red>！！！注意：编译打包内核时虚拟机磁盘可用空间可能超过20G，如果新安装虚拟机，磁盘空间最好分配大一点！！！</font>***
 
 ### 2.基本配置和网络配置
 
 #### 2.1基本配置
 
-ubuntu安装完成后，由于是Virtualbox的虚拟机，界面分辨率修改起来比较困难，GUI使用体验不好，共用粘贴板和共享文件夹扩展时好时坏；故使用ssh，利用Xhell+Xftp代替共享文件夹进行文件传输和终端，利用VSCode ssh远程开发代替共用粘贴板等。 
-
-在未进行ssh连接前需要进行基本的应用安装（若非虚拟机或有其他个人解决方案跳过此步）
+虚拟机需要的基本的应用安装
 
 * vim安装: `sudo apt-get install vim`
-* ssh安装（https://www.cnblogs.com/lishubin/p/11672037.html)
+* ssh安装（参考https://www.cnblogs.com/lishubin/p/11672037.html，若不使用ssh连接可跳过)
 
 #### 2.2网络配置
 
 * 在***未进入虚拟机***前为虚拟机配置两个网卡：
   * 网络地址转换NAT：用于通过宿主主机接入互联网
-  * 仅主机网络：用于宿主主机ssh远程连接
-* 终端输入ifconfig，查看仅主机网络IP地址，并使用宿主主机ping测试是否可以ping通（可跳过）
-* 使用Xhell等ssh连接
+  * 仅主机网络：用于宿主主机ssh远程连接（可跳过）
+* 终端输入`ifconfig`，查看仅主机网络IP地址，并使用宿主主机测试是否可以ping通（可跳过）
+* 使用Xhell等ssh连接(可跳过)
 
 ### 3.下载Xenomai相关安装包和补丁文件
 
@@ -76,11 +74,11 @@ ubuntu安装完成后，由于是Virtualbox的虚拟机，界面分辨率修改�
 
 * 创建/xenomai文件夹，并在/xenomai下创建***子文件夹***/4.19.66，并将***ipipe-core-4.19.66-x86-6.patch***和***linux-4.19.66.tar.gz***放入/4.19.66，将***xenomai-v3.2.1.tar.gz***放入/xenomai
 
-* 解压压缩文件（***<font color=red>注：在文件所在目录下执行命令，不要在其他目录解压</font>***）
-  
+* 解压压缩文件（<font color=red>注：下面的指令需要在压缩包所在目录中解压，否则指定解压后的目标文件路径，使解压后的文件目录结构如下面所示</font>）
+
   * `sudo tar zxvf xenomai-v3.2.1.tar.gz`
   * `sudo tar zxvf linux-4.19.66.tar.gz`
-  
+
 * 解压完成后文件目录结构
 
   ```shell
@@ -91,31 +89,14 @@ ubuntu安装完成后，由于是Virtualbox的虚拟机，界面分辨率修改�
   │   ├── linux-4.19.66
   │   └── linux-4.19.66.tar.gz
   ├── xenomai-v3.2.1
-  │   ├── config
-  │   ├── configure.ac
-  │   ├── CONTRIBUTING.md
-  │   ├── debian
-  │   ├── demo
-  │   ├── doc
-  │   ├── include
-  │   ├── kernel
-  │   ├── lib
-  │   ├── Makefile.am
-  │   ├── README
-  │   ├── scripts
-  │   ├── testsuite
-  │   └── utils
   └── xenomai-v3.2.1.tar.gz
-  
-  13 directories, 7 files
   ```
-  
+
   若解压到错误路径，删除该目录`sudo rm -rf 目录`，然后重新解压到正确路径。
 
 ### 4.安装必要的组件
 
-* `sudo apt-get install build-essential libncurses5-dev bison flex libssl-dev`
-* `sudo apt-get install kernel-package`
+* `sudo apt-get install build-essential libncurses5-dev bison flex libssl-dev kernel-package` 
 
 ### 5.准备Linux内核
 
@@ -160,13 +141,13 @@ ubuntu安装完成后，由于是Virtualbox的虚拟机，界面分辨率修改�
    * Drivers (根据需要打开CAN、RTnet等驱动)
 5. 检查EFI设置，保证其被使能
    * Power management and ACPI options > 
-            ACPI (Advanced Configutation and Power Interface) Support > 只关闭Processor，其余不关闭
+         ACPI (Advanced Configutation and Power Interface) Support > 只关闭Processor，其余不关闭
    * Processor type and features >
-            EFI runtime service support 开启
-            EFI stub support 开启
+         EFI runtime service support 开启
+         EFI stub support 开启
    * Firmware Drivers >
-            EFI (Extensible Firmware Interface) Support >
-                EFI Variable Support via sysfs 开启
+         EFI (Extensible Firmware Interface) Support >
+             EFI Variable Support via sysfs 开启
 
 #### 5.3编译和打包内核和头文件
 
@@ -176,9 +157,10 @@ ubuntu安装完成后，由于是Virtualbox的虚拟机，界面分辨率修改�
 
    `sudo touch REPORTING-BUGS`
 
-2. 在/xenomai/4.19.66/linux-4.19.66目录下打开终端执行(<font color=red>耗时较长，根据主机配置耗时可能长达2~7h。注意修改自动息屏/睡眠时间；以及最好不要使用SSH终端运行，防止链接中断导致编译中断；再者注意磁盘剩余空间，根据内核配置需求中间文件会占用不下于20G的磁盘空间</font>)
-   
+2. 在/xenomai/4.19.66/linux-4.19.66目录下打开终端执行(<font color=red>耗时较长，根据主机配置耗时可能长达2~3h。注意修改自动息屏/睡眠时间；以及最好不要使用SSH终端运行，防止链接中断导致编译中断；再者注意磁盘剩余空间，根据内核配置需求中间文件可能会占用不下于20G的磁盘空间</font>)
+
    * `sudo make-kpkg --initrd --revision 01 --append-to-version -xeno20220529 kernel_image kernel_headers`
+
 3. 编译完成后，/xenomai/4.19.66/目录下出现编译完的***linux-headers-4.19.66-xeno20220529_01_amd64.deb***和***linux-image-4.19.66-xeno20220529_01_amd64.deb***
 
 #### 6.编译和安装内核
@@ -223,7 +205,7 @@ ubuntu安装完成后，由于是Virtualbox的虚拟机，界面分辨率修改�
 
 #### 7.配置启动界面，在启动菜单选择内核
 
-1. 修改配置信息`sudo vim /etc/default/grub`
+1. 修改GRUB配置信息`sudo vim /etc/default/grub`
 
    GRUB_HIDDEN_TIMEOUT=0 注释掉
    GRUB_TIMEOUT=3
@@ -231,10 +213,9 @@ ubuntu安装完成后，由于是Virtualbox的虚拟机，界面分辨率修改�
 
    具体含义参考https://blog.csdn.net/piaopiaopiaopiaopiao/article/details/11772053
 
-2. 更新配置信息`sudo update-grub`
-   重启
+2. 更新GRUB配置信息`sudo update-grub`，然后重启(reboot)
 
-3. 在启动界面选择：***ubuntu高级选项>新安装的内核***
+3. 在启动界面选择：***ubuntu高级选项 > 新安装的内核***
 
 4. `uname -a`查看是否选择成功
 
@@ -292,6 +273,4 @@ echo 0 > /proc/xenomai/latency
 3. 使更改生效
 
    `sudo /sbin/ldconfig -v`
-
-#### 
 
