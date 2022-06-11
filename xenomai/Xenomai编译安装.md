@@ -1,15 +1,5 @@
 # 虚拟机中Ubuntu16.04.7下Xenomai3.2.1编译&安装&配置步骤（Linux-4.16.99）
 
-## 环境配置
-
-* Oracle VM VirtualBox 6.1.18
-* ubuntu-16.04.7-desktop-amd64
-* Xshell 7 7.0.0076
-* Xftp 7 7.0.0074
-* Visual Studio Code 1.67.2
-
-
-
 ## 基本步骤
 
 ### 1.下载Ubuntu16.04.7镜像源并安装
