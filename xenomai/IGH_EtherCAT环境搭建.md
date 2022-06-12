@@ -1,12 +1,5 @@
 # IGH_EtherCAT主站环境搭建
 
-参考：
-
-* https://github.com/ART-robot/ethercat_install
-* 《基于Xenomai的EtherCAT主站开发与实时性优化》邱昌华
-
-
-
 ## 1.下载IGH_EtherCAT源码
 
 https://github.com/ribalda/ethercat.git
@@ -49,7 +42,7 @@ sudo apt-get install linux-headers-$(uname -r)
 
 ### 3.2 查看网卡型号
 
-1. 首先查看网卡`ifconfig`
+1. 首先查看网卡信息`ifconfig`
 
 ```shell
 cdx@cdx-VirtualBox:~/xenomai/ethercat$ ifconfig 
@@ -97,7 +90,7 @@ supports-register-dump: yes
 supports-priv-flags: no
 ```
 
-3. 记下driver类型为e1000
+3. 记下driver类型为***e1000***
 
 
 
@@ -113,7 +106,7 @@ supports-priv-flags: no
 
 注：
 
-* 注意网卡类型，否则容易出错：
+* 注意enable网卡类型，否则容易出错：
 
   ```shell
   checking for kernel for r8169 driver... configure: error: kernel 4.19 not available for r8169 driver!
@@ -295,7 +288,18 @@ sudo vim /etc/security/limits.conf
 
 3. `ethercat -help`查看是否成功
 
-   
+
+
+## 参考
+
+* https://github.com/ART-robot/ethercat_install
+* 《基于Xenomai的EtherCAT主站开发与实时性优化》邱昌华
+
+
+
+***
+
+
 
 # 运行
 
@@ -312,6 +316,8 @@ sudo /etc/init.d/ethercat start
 ```
 
 找到类似错误[modprobe: ERROR: could not insert 'rtw89pci': Operation not permitted · Issue #67 · lwfinger/rtw89 (github.com)](https://github.com/lwfinger/rtw89/issues/67)和[uefi - Why do I get "Required key not available" when install 3rd party kernel modules or after a kernel upgrade? - Ask Ubuntu](https://askubuntu.com/questions/762254/why-do-i-get-required-key-not-available-when-install-3rd-party-kernel-modules)
+
+尝试使用其中方法解决问题记录如下（失败）：
 
 * 第一次尝试进入BIOS取消Secure Boot
 
@@ -396,14 +402,18 @@ sudo /etc/init.d/ethercat start
       efi variables are not support on this system
       ```
 
-* 最终解决办法：参考[command line - Ubuntu - EFI variables are not supported on this system - Ask Ubuntu](https://askubuntu.com/questions/901039/ubuntu-efi-variables-are-not-supported-on-this-system)，几乎没有办法补救virtualbox的这个问题，只能重新编译安装内核，配置内核时关闭Module签名需求（Enable loadable module support >Module signature verification 关闭）。
+* 最终解决办法：参考[command line - Ubuntu - EFI variables are not supported on this system - Ask Ubuntu](https://askubuntu.com/questions/901039/ubuntu-efi-variables-are-not-supported-on-this-system)，按照回复者说法几乎没有办法补救virtualbox的这个问题，只能重新编译安装内核，在配置内核时关闭Module签名需求（Enable loadable module support >Module signature verification 关闭）。
 
-启动成功后：
+重新编译并启动，成功后：
 
 ```shell
 cdx@cdx-VirtualBox:~$ sudo /etc/init.d/ethercat start 
 Starting EtherCAT master 1.5.2  done
 ```
+
+
+
+注：在***xenomai/Xenomai编译安装.md***->***5.2编译内核***中步骤6已经说明需要***关闭Module签名需求***，按照[command line - Ubuntu - EFI variables are not supported on this system - Ask Ubuntu](https://askubuntu.com/questions/901039/ubuntu-efi-variables-are-not-supported-on-this-system)说法，因为virtualbox的虚拟机特殊性不得不在编译内核的配置阶段处理这个问题；然而对于其他虚拟机或实体机，若出现以上问题，可以尝试使用上面尝试失败的方法或其他可行方法。
 
 
 
